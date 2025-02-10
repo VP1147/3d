@@ -16,11 +16,12 @@ def plot_3d_trajectory(x, y, z):
     """
     Plots the 3D trajectory using matplotlib.
     """
+    plt.style.use('dark_background')
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot the trajectory
-    ax.plot3D(x, y, z, 'bo-', markersize=4, linewidth=1, label='Trajectory')
+    ax.plot3D(x, y, z, 'bo-', markersize=1, linewidth=0, color="yellow", label='Trajectory')
 
     # Add labels and title
     ax.set_xlabel('X (m)')
