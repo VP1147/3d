@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_gpu.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -48,15 +48,32 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Initialize SDL and SDL_gpu
+    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "SDL initialization failed: %s\n", SDL_GetError());
         return 1;
     }
 
-    GPU_Target *screen = GPU_Init(WINDOW_WIDTH, WINDOW_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
-    if (!screen) {
-        fprintf(stderr, "GPU initialization failed: %s\n", GPU_GetError());
+    // Create a window
+    SDL_Window *window = SDL_CreateWindow(
+        "3D Plotter",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT,
+        SDL_WINDOW_SHOWN
+    );
+    if (!window) {
+        fprintf(stderr, "Window creation failed: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
+
+    // Create a renderer
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        fprintf(stderr, "Renderer creation failed: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
     }
@@ -73,23 +90,27 @@ int main(int argc, char *argv[]) {
         }
 
         // Clear the screen
-        GPU_Clear(screen);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+        SDL_RenderClear(renderer);
 
         // Render the 3D points
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White points
         for (int i = 0; i < point_count; i++) {
             int screenX, screenY;
             project_point(points[i][0], points[i][1], points[i][2], &screenX, &screenY);
 
-            // Draw a small circle for each point
-            GPU_CircleFilled(screen, screenX, screenY, 3, GPU_MakeColor(255, 255, 255, 255));
+            // Draw a small rectangle for each point
+            SDL_Rect pointRect = {screenX - 2, screenY - 2, 4, 4};
+            SDL_RenderFillRect(renderer, &pointRect);
         }
 
         // Update the screen
-        GPU_Flip(screen);
+        SDL_RenderPresent(renderer);
     }
 
     // Clean up
-    GPU_Quit();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;
