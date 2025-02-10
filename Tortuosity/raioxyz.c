@@ -32,11 +32,13 @@ float x,y,z,cp,minnz,unitx,unity,unitz,xEx,yEy,zEz,unitxEx,unityEy,unitzEz,Hp,Hn
 int nx,ny,nz,sx,sy,sz,i,j,m1,m2,m3,g;
 
 #define MAX_LINE_LENGTH 	2048		// Comprimento max. do arquivo CSV
-#define NUM_ITERACOES 		10   		// Numero de iteracoes
+#define NUM_ITERACOES 		30   		// Numero de iteracoes
+#define CLEAR_DAT					1				// 1 - Limpa o arquivo .dat ao iniciar
 
 // Funcao principal
 int main() {
 	FILE *coord1;
+	srand(time(NULL));
 
 	printf("raioxyz.c - Aplica o metodo Monte Carlo para gerar canais tortuosos.\n");
 	printf("Calcula o modulo do campo eletrico Et(x,y,z) = Ex(x,y,z) + Ey(x,y,z) + Ez(x,y,z)\n");
@@ -44,7 +46,11 @@ int main() {
 	printf("Calcula a orientacao do vetor densidade de correntes (j). Versao beta (mar. 2000)\n");
 	printf("Modulo 2D: MOACIR LACERDA; Modulo 3D: EDUARDO AUGUSTO CURVO\n");
 	printf("CSV parser: VINICIUS PAVAO");
-
+	
+ 	if(CLEAR_DAT == 1) {
+ 		// Limpa o arquivo .dat
+ 		fclose(fopen("raio3d1.dat", "w"));
+ 	}
 	entradas();
 
 	g=0;
@@ -70,19 +76,16 @@ int main() {
  			m3 = 0;
 
   		do {
-				srand(time(NULL));
 				sx = rand() % nx;
 				m1 = m1 + 1;
 			} while (m1 < 6000);
 
   		do {
-				srand(time(NULL));
 				sy = rand() % ny;
 				m2 = m2 + 1;
 	 		} while (m2 < 6000);
 
   		do {
-				srand(time(NULL));
 				sz = rand() % nz;
 				m3 = m3 + 1;
 	 		} while (m3 < 6000);
@@ -156,7 +159,7 @@ double *parse_csv_numbers(const char *filename, int *count) {
                 capacity *= 2;
                 numbers = (double *)realloc(numbers, capacity * sizeof(double));
                 if (numbers == NULL) {
-                    perror("Error reallocating memory");
+                    perror("Problema ao alocar memoria!\n");
                     fclose(file);
                     return NULL;
                 }
@@ -173,17 +176,16 @@ double *parse_csv_numbers(const char *filename, int *count) {
     // Resize the array to the actual number of elements
     numbers = (double *)realloc(numbers, size * sizeof(double));
     if (numbers == NULL && size > 0) {
-        perror("Error finalizing memory allocation");
+        perror("Problema ao realocar memoria!\n");
         return NULL;
     }
 
     // Set the count of numbers
     *count = size;
-
     return numbers;
 }
 
-// Recebe os valores do arquivo CSV definidos pelo cliente
+// Recebe os valores do arquivo CSV definidos pelo usuario
 int entradas() {
 	FILE *coord2;
 	coord2 = fopen("raioen3d1.dat","at");
@@ -194,7 +196,7 @@ int entradas() {
 	printf("Recebendo os parametros do arquivo 'entrada.csv'\n");
 	numbers = parse_csv_numbers(filename, &count);
 	if (numbers == NULL) {
-		fprintf(stderr, "Falha ao abrir o arquivo\n");
+		fprintf(stderr, "Falha ao abrir o arquivo!\n");
 		return EXIT_FAILURE;
 	}
 	printf("%d valores lidos em 'entrada.csv'\n", count);
