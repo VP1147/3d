@@ -46,7 +46,7 @@ int main() {
 	printf("Calcula a orientacao do vetor densidade de correntes (j). Versao beta (mar. 2000)\n");
 	printf("Modulo 2D: MOACIR LACERDA; Modulo 3D: EDUARDO AUGUSTO CURVO\n");
 	printf("CSV parser: VINICIUS PAVAO");
-	
+
  	if(CLEAR_DAT == 1) {
  		// Limpa o arquivo .dat
  		fclose(fopen("raio3d1.dat", "w"));
@@ -199,18 +199,17 @@ int entradas() {
 		fprintf(stderr, "Falha ao abrir o arquivo!\n");
 		return EXIT_FAILURE;
 	}
-	printf("%d valores lidos em 'entrada.csv'\n", count);
 	x = numbers[0];
 	printf("x = %fm\n", x);
-	xo = x;
+	// xo = x;
 
 	y = numbers[1];
 	printf("y = %fm\n", y);
-	yo = y;
+	// yo = y;
 
 	z = numbers[2];
 	printf("z = %fm\n", z);
-	zo = z;
+	// zo = z;
 
 	xEx = x;
 	yEy = y;
@@ -253,8 +252,17 @@ int entradas() {
 	minnz = numbers[13];
 	printf("minnz = %f\n", minnz);
 
+	xo = numbers[14];
+	printf("xo = %f\n", xo);
+
+	yo = numbers[15];
+	printf("yo = %f\n", yo);
+
+	zo = numbers[16];
+	printf("zo = %f\n", zo);
+
 	fprintf (coord2,"\n");
-	fprintf (coord2,"%f %f %f %f %f %f %f %f %f %i %i %i",x,y,z,Hp,H1p,Hn,Qp,Q1p,Qn,nx,ny,nz);
+	fprintf (coord2,"%f %f %f %f %f %f %f %f %f %i %i %i %f %f %f",x,y,z,Hp,H1p,Hn,Qp,Q1p,Qn,nx,ny,nz,xo,yo,zo);
 	fclose(coord2);
 
 }
