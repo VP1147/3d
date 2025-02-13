@@ -5,7 +5,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define MAX_POINTS 1000
+#define MAX_POINTS 100000
 
 // Function to read 3D points from a CSV file
 int read_csv(const char *filename, float points[MAX_POINTS][3], int *count) {
