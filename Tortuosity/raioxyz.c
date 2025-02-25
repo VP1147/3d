@@ -2,7 +2,7 @@
 /*calcula o modulo do campo eletrico Et(x,y,z)=Ex(x,y,z)+Ey(x,y,z)+Ez(x,y,z)*/
 /* em forna de um tripolo com cargas Qp, Qn, Q1p em Hp, Hn e H1p imagens */
 /* calcula a orientacao do vetor densidade de correntes (j) versao beta mar/2000 */
-/* Autor modulo 2d: MOACIR LACERDA; Modulo 3d:EDUARDO A.CURVO*/
+/* Autor modulo 2d: MOACIR LACERDA; Modulo 3d:EDUARDO A. CURVO*/
 /* CSV parser: Vinicius Pavao */
 
 #include <stdio.h>
@@ -22,11 +22,18 @@ static int calcjt();
 static int calcenz();
 static int calcet();
 
+// Coordenadas do campo eletrico da carga Qp
+double Epx, Epy, Epz;
 
-// Definindo as variaveis
-double Epz,E1pz,Enz,Ez;
-double Epx,E1px,Enx,Ex;
-double Epy,E1py,Eny,Ey;
+// Coordenadas do campo eletrico da carga Qn
+double Enx, Eny, Enz;
+
+// Coordenadas do campo eletrico da carga Q1p
+double E1px, E1py, E1pz;
+
+// Coordenadas do campo eletrico resultante
+double Ex, Ey, Ez;
+
 double Et,jx,jy,jz,jt,sigx,sigy,sigz,sigo;
 float x,y,z,cp,minnz,unitx,unity,unitz,xEx,yEy,zEz,unitxEx,unityEy,unitzEz,Hp,Hn,H1p,Qp,Qn,Q1p,xo,yo,zo;
 int nx,ny,nz,sx,sy,sz,i,j,m1,m2,m3,g;
@@ -100,6 +107,7 @@ int main() {
   		yEy = yEy + cp * unityEy;
   		zEz = zEz + cp * unitzEz;
 
+  		// Insere as coordenadas no arquivo CSV
   		fprintf(coord1, "\n");
   		fprintf(coord1,"%f %f %f %f %f %f %d %d %d %f %f %f %f %f ",x,y,z,xEx,yEy,zEz,sx,sy,sz,unitz,unitzEz,Ex,Ey,Ez);
   		i = i + 1;
@@ -115,10 +123,6 @@ int main() {
 
   return (0);
   }
-
-// Valores definidos pelo cliente
-float x,y,z,Hp,Qp,H1p,Q1p,Hn,Qn,xEx,xEy,zEz,xo,yo,zo,minnz;
-int nx,ny,nz;
 
 // Function to parse numbers from a CSV file
 double *parse_csv_numbers(const char *filename, int *count) {
@@ -185,11 +189,14 @@ double *parse_csv_numbers(const char *filename, int *count) {
     return numbers;
 }
 
+// Valores a serem definidos pelo cliente
+float x,y,z,Hp,Qp,H1p,Q1p,Hn,Qn,xo,yo,zo,minnz;
+float Xp, Yp, Xn, Yn, X1p, Y1p;
+int nx, ny, nz;
+float xEx,xEy,zEz;
+
 // Recebe os valores do arquivo CSV definidos pelo usuario
 int entradas() {
-	FILE *coord2;
-	coord2 = fopen("raioen3d1.dat","at");
-
 	const char *filename = "entrada.csv";
   int count;
   double *numbers;
@@ -261,10 +268,23 @@ int entradas() {
 	zo = numbers[16];
 	printf("zo = %f\n", zo);
 
-	fprintf (coord2,"\n");
-	fprintf (coord2,"%f %f %f %f %f %f %f %f %f %i %i %i %f %f %f",x,y,z,Hp,H1p,Hn,Qp,Q1p,Qn,nx,ny,nz,xo,yo,zo);
-	fclose(coord2);
+	Xp = numbers[17];
+	printf("xp = %f\n", Xp);
 
+	Yp = numbers[18];
+	printf("yp = %f\n", Yp);
+
+	Xn = numbers[19];
+	printf("xn = %f\n", Xn);
+
+	Yn = numbers[20];
+	printf("yn = %f\n", Yn);
+
+	X1p = numbers[21];
+	printf("x1p = %f\n", X1p);
+
+	Y1p = numbers[22];
+	printf("y1p = %f\n", Y1p);
 }
 
 float x, y, z, Hp, Qp, Qnim;
@@ -273,12 +293,12 @@ double Ka, Epz, Epx, Epy;
 int calcepz() {
 	Ka=-9*pow(10,9);
 	Qnim=-Qp;
-	Epz=Ka*(Qp*(z-Hp))/(pow(pow(Hp-z,2)+pow(x,2),1.5))+
-		 Ka*(Qnim*(z+Hp))/(pow(pow(Hp+z,2)+pow(x,2),1.5));
-	Epx=Ka*(Qp*x)/(pow(pow(Hp-z,2)+pow(x,2),1.5))+
-		 Ka*(Qnim*x)/(pow(pow(Hp+z,2)+pow(x,2),1.5));
-	Epy=Ka*(Qp*y)/(pow(pow(Hp-z,2)+pow(y,2),1.5))+
-		 Ka*(Qnim*y)/(pow(pow(Hp+z,2)+pow(y,2),1.5));
+	Epz=Ka*(Qp*(z-Hp))/(pow(pow(Hp-z,2)+pow(Xp,2),1.5))+
+		 Ka*(Qnim*(z+Hp))/(pow(pow(Hp+z,2)+pow(Xp,2),1.5));
+	Epx=Ka*(Qp*Xp)/(pow(pow(Hp-z,2)+pow(Xp,2),1.5))+
+		 Ka*(Qnim*Xp)/(pow(pow(Hp+z,2)+pow(Xp,2),1.5));
+	Epy=Ka*(Qp*Yp)/(pow(pow(Hp-z,2)+pow(Yp,2),1.5))+
+		 Ka*(Qnim*Yp)/(pow(pow(Hp+z,2)+pow(Yp,2),1.5));
 	  return (0);
 }
 
@@ -288,12 +308,12 @@ double Ka, E1pz, E1px, E1py;
 int calce1pz() {
 	Ka=-9*pow(10,9);
 	Q1nim=-Q1p;
-	E1pz=Ka*(Q1p*(z-H1p))/(pow(pow(H1p-z,2)+pow(x,2),1.5)) +
-		  Ka*(Q1nim*(z+H1p))/(pow(pow(H1p+z,2)+pow(x,2),1.5));
-	E1px=Ka*(Q1p*x)/(pow(pow(H1p-z,2)+pow(x,2),1.5)) +
-		  Ka*(Q1nim*x)/(pow(pow(H1p+z,2)+pow(x,2),1.5));
-	E1py=Ka*(Q1p*y)/(pow(pow(H1p-z,2)+pow(y,2),1.5)) +   //Se der algum problema talvez seja aqui.
-		  Ka*(Q1nim*y)/(pow(pow(H1p+z,2)+pow(y,2),1.5));
+	E1pz=Ka*(Q1p*(z-H1p))/(pow(pow(H1p-z,2)+pow(X1p,2),1.5)) +
+		  Ka*(Q1nim*(z+H1p))/(pow(pow(H1p+z,2)+pow(X1p,2),1.5));
+	E1px=Ka*(Q1p*X1p)/(pow(pow(H1p-z,2)+pow(X1p,2),1.5)) +
+		  Ka*(Q1nim*X1p)/(pow(pow(H1p+z,2)+pow(X1p,2),1.5));
+	E1py=Ka*(Q1p*Y1p)/(pow(pow(H1p-z,2)+pow(Y1p,2),1.5)) +
+		  Ka*(Q1nim*Y1p)/(pow(pow(H1p+z,2)+pow(Y1p,2),1.5));
 	  return (0);
 }
 
@@ -303,18 +323,19 @@ double Ka, Enz, Enx, Eny;
 int calcenz() {
 	 Ka=-9*pow(10,9);
 	 Qpim=-Qn;
-	Enz=Ka*(Qn*(z-Hn))/(pow(pow(Hn-z,2)+pow(x,2),1.5))+
-		 Ka*(Qpim*(z+Hn))/(pow(pow(Hn+z,2)+pow(x,2),1.5));
-	Enx=Ka*(Qn*x)/(pow(pow(Hn-z,2)+pow(x,2),1.5))+
-		 Ka*(Qpim*x)/(pow(pow(Hn+z,2)+pow(x,2),1.5));
-	Enx=Ka*(Qn*y)/(pow(pow(Hn-z,2)+pow(y,2),1.5))+
-		 Ka*(Qpim*y)/(pow(pow(Hn+z,2)+pow(y,2),1.5));
+	Enz=Ka*(Qn*(z-Hn))/(pow(pow(Hn-z,2)+pow(Xn,2),1.5))+
+		 Ka*(Qpim*(z+Hn))/(pow(pow(Hn+z,2)+pow(Xn,2),1.5));
+	Enx=Ka*(Qn*Xn)/(pow(pow(Hn-z,2)+pow(Xn,2),1.5))+
+		 Ka*(Qpim*Xn)/(pow(pow(Hn+z,2)+pow(Xn,2),1.5));
+	Enx=Ka*(Qn*Yn)/(pow(pow(Hn-z,2)+pow(Yn,2),1.5))+
+		 Ka*(Qpim*Yn)/(pow(pow(Hn+z,2)+pow(Yn,2),1.5));
 	  return (0);
 }
 
 double Enz,Enx,Eny,E1pz,E1px,E1py,Enz,Enx,Eny,Ez,Ex,Ey,Et,jz,jx,jy,jt;
 float x,y,z,Hp,Qp,H1p,Q1p,Hn,Qn,minnz,unitx,unity,unitz;
 int sx,sy,sz;
+
 int saidas() {
 	printf ("\n");
 	printf (" O valor de Enz  e':%f \n", Enz);
@@ -368,6 +389,7 @@ int saidas() {
 
 
 double Ez,Epz,E1pz,Enpz,Ex,Epx,E1px,Enx,Ey,Epy,E1py,Eny,Et;
+
 int calcet() {
   Ez = Epz + E1pz + Enz;
   Ex = Epx + E1px + Enx;

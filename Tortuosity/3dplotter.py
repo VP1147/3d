@@ -21,13 +21,25 @@ def plot_3d_trajectory(x, y, z):
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot the trajectory
-    ax.plot3D(x, y, z, 'bo-', markersize=1, linewidth=0, color="yellow", label='Trajectory')
+    ax.plot3D(x, y, z, 'bo-', markersize=1, linewidth=0, color="yellow", label='Trajetória do raio')
+
+    # Plot the projections
+    nully, nullx = [], []
+    for i in range (0, len(x)):
+        nully.append(y[0])
+
+    for i in range (0, len(y)):
+        nullx.append(x[0])
+
+    ax.plot3D(nullx, y, z, 'bo-', markersize=0.5, linewidth=0, color="white", label='Projeção X')
+    ax.plot3D(x, nully, z, 'bo-', markersize=0.5, linewidth=0, color="white", label='Projeção Y')
+    ax.plot3D(x, y, 0, 'bo-', markersize=0.5, linewidth=0, color="white", label='Projeção Z')
 
     # Add labels and title
     ax.set_xlabel('X (m)')
     ax.set_ylabel('Y (m)')
     ax.set_zlabel('Z (m)')
-    ax.set_title('3D Trajectory Visualization')
+    ax.set_title('Visualizador 3D')
 
     # Add a legend
     ax.legend()
